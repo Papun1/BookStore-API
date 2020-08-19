@@ -4,6 +4,39 @@
         <name>BookStore-API</name>
     </assembly>
     <members>
+        <member name="T:BookStore_API.Controllers.AuthorController">
+            <summary>
+            End point used to intract with the Author in the BookStore's Database
+            </summary>
+        </member>
+        <member name="M:BookStore_API.Controllers.AuthorController.GetAuthors">
+            <summary>
+            Get All Authors
+            </summary>
+            <returns>List of Authors</returns>
+        </member>
+        <member name="M:BookStore_API.Controllers.AuthorController.GetAuthor(System.Int32)">
+            <summary>
+            Get An author by id
+            </summary>
+            <param name="id"></param>
+            <returns>Author's record</returns>
+        </member>
+        <member name="M:BookStore_API.Controllers.AuthorController.Create(BookStore_API.DTOs.AuthorCreateDTO)">
+            <summary>
+            Create an Author
+            </summary>
+            <param name="authorDTO"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BookStore_API.Controllers.AuthorController.Udate(System.Int32,BookStore_API.DTOs.AuthorUpdateDTO)">
+            <summary>
+            Update author details
+            </summary>
+            <param name="id"></param>
+            <param name="authorDTO"></param>
+            <returns></returns>
+        </member>
         <member name="T:BookStore_API.Controllers.HomeController">
             <summary>
             TEST API
