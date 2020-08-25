@@ -6,6 +6,7 @@ using AutoMapper;
 using BookStore_API.Contracts;
 using BookStore_API.Data;
 using BookStore_API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,7 @@ namespace BookStore_API.Controllers
         /// <returns>List of Books</returns>
 
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetBooks()
@@ -60,6 +62,7 @@ namespace BookStore_API.Controllers
         /// <param name="id"></param>
         /// <returns>Book's record</returns>
         [HttpGet("{id}")]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -91,6 +94,7 @@ namespace BookStore_API.Controllers
         /// <param name="BookDTO"></param>
         /// <returns></returns>
         [HttpPost]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -133,6 +137,7 @@ namespace BookStore_API.Controllers
         /// <param name="BookDTO"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [Authorize]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -170,6 +175,46 @@ namespace BookStore_API.Controllers
             catch (Exception ex)
             {
                 return InternalError($"{location}-{ex.Message}-{ex.InnerException}");
+            }
+        }
+        /// <summary>
+        /// delete the book by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Customer")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                _logger.LogInfo($"Book detail delete with id:{id}");
+                if (id < 1)
+                {
+                    _logger.LogWarn("Book details not avaible");
+                    return BadRequest();
+                }
+                var isExist = await _BookRepository.isExist(id);
+                if (!isExist)
+                {
+                    _logger.LogWarn($"Book with id:{id} was not found");
+                    return NotFound();
+                }
+                var Book = await _BookRepository.FindById(id);
+                var isSuccess = await _BookRepository.Delete(Book);
+                if (!isSuccess)
+                {
+                    return InternalError("Book delete failed");
+                }
+                _logger.LogInfo("Book delete");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return InternalError($"{ex.Message}-{ex.InnerException}");
             }
         }
         private string GetCollectActionNames()
